@@ -163,6 +163,49 @@ El primer método es útil si la aceleración es resultado de los actuadores del
 
 
 Si no es posible predecir la aceleración porque esta viene de un sistema ajeno al nuestro, una técnica útil es descartar las mediciones que esten fuera de un rango de 1 \textbf{g} 
+
+ \begin{figure}[H]
+	\center
+	\includegraphics[width=0.8\linewidth, page=1,]{Imagenes/gravedadac}
+	\caption{Algoritmo medici\'on gravedad}
+	\label{fig:Esq_con:grav}
+\end{figure}
+
+La solución de descartar las mediciones fuera de un rango de 1 g, trae el problema que en estos momentos, se pierde la orientación del objeto, lo cual para algunos sistemas no es un problema como alguno estacionaraio. Mientras que para otros si, donde el sistema este acelerando o rotando.
+
+
+Hasta ahora se utilizó sensor fusion para estimar el ángulo a partir del aceler\'ometro y un magnet\'ometro. A continuaci\'on se plantea como llegar al mismo fin, utilizando un gir\'oscopo.
+
+
+
+Un gri\'oscopo mide velocidad angular, al multiplicarla por el per\'iodo de muestreo se obtiene el cambio de angulo en ese tiempo, al sumarle el delta anterior se obtiene el \'angulo acutal.
+
+ \begin{figure}[H]
+	\center
+	\includegraphics[width=0.8\linewidth, page=1,]{Imagenes/giroscmeas
+}
+	\caption{Algoritmo medici\'on ángulo}
+	\label{fig:Esq_con:ang}
+\end{figure}
+
+Básicamente es integrar las mediciones del giróscopo.
+Esta técnica tiene algunos problemas, primero se necesita un ángulo inicial por donde comenzar la estimación. Además los sensores no son perfectos, tienen error de offset y ruido, por lo que al integrarlo si bien el ruido puede ser reducido (pasabajos), el offset producirá que haya un error de deriva, provocando que el error aumente en función del tiempo.
+
+
+Con las dos alternativas para la medición del ángulo tenemos ventajas y desventajas.
+Para el acelerómetro + magnet\'ometro tiene la ventaja de producir una medici\'on absoluta, mientras que es corrompido por perturbaciones. Y el gir\'oscopop que puede obtener mediciones relativas ante disturbios, pero necesita una orientaci\'on inicial y tiene el problema de la deriva.
+
+
+La idea de sensor fusion nuevamente ser\'a combinar las estimaciones de ambos sistemas de manera que enfatice sus ventajas y minimice sus puntos débiles. 
+Para lograr esto existen diversos m\'etodos, por ejemplo se pueden utilizar filtros complementarios, de Kalman, de Madgwick o de Mahony entre otros.
+
+
+En lineas generales todos comparten el siguiente esquema:
+\begin{itemize}
+\item Definen condiciones iniciales, sea de manera manual o utilizando mediciones iniciales.
+\item Utilizan las mediciones del aceler\'ometro y magnet\'ometro para corregir la deriva del gir\'oscopo.
+\item Las estimaciones de en que soluci\'on se conf\'ia mas depender\'a en una regla de desici\'on, en el complementario es decidido por el diseñador y en el filtro de kalman es la ganancia de kalman por ejemplo.
+\end{itemize}
 \subsection{Actuadores}
 \subsubsection{Motores}
 \subsection{Lazo de control propuesto}
@@ -175,7 +218,6 @@ Si no es posible predecir la aceleración porque esta viene de un sistema ajeno 
 \end{figure}
 
 \subsubsection{Motores FOC}
-\subsubsection{Kalman Filter}
 
 
 %Esquema preeliminar de control (lógica gral.) Sensores y actuadores que intervienen (no deben seleccionar o definir los componentes; solo dar una idea de qué se podría utilizar en cada caso o cual es el parámetro o variable que deberían medir).
